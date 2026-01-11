@@ -266,29 +266,6 @@ if not filtered_df.empty:
     explanation = f"This district exhibits {risk_level} service stress risk, primarily driven by a {bio_level} biometric-to-enrolment ratio. This suggests {'significant infrastructure and operational pressure' if bio_level == 'high' else 'relatively stable service demands'}."
     st.write(explanation)
     
-    # AI-Generated Recommendation
-    st.header('AI-Generated Recommendation')
-    
-    # Define thresholds for high pressure
-    high_bio_threshold = df['biometric_to_enrolment_ratio'].quantile(0.75)
-    high_child_threshold = df['child_update_pressure'].quantile(0.75) if df['child_update_pressure'].notna().any() else 0.01
-    high_elderly_threshold = df['elderly_update_pressure'].quantile(0.75) if df['elderly_update_pressure'].notna().any() else 0.01
-    
-    bio_ratio = row['biometric_to_enrolment_ratio']
-    child_pressure = row['child_update_pressure'] if pd.notna(row['child_update_pressure']) else 0
-    elderly_pressure = row['elderly_update_pressure'] if pd.notna(row['elderly_update_pressure']) else 0
-    
-    if elderly_pressure > high_elderly_threshold:
-        recommendation = "Deploy mobile biometric vans to reach elderly citizens in remote and underserved areas, reducing travel burden and improving update completion rates."
-    elif child_pressure > high_child_threshold:
-        recommendation = "Organize school-based Aadhaar enrolment and update camps in collaboration with education departments to capture growing child populations efficiently."
-    elif bio_ratio > high_bio_threshold:
-        recommendation = "Increase the number of update-only service counters and digital infrastructure to handle high biometric update demand without affecting new enrolments."
-    else:
-        recommendation = "Maintain current service levels with regular monitoring and consider preventive measures like awareness campaigns for timely updates."
-    
-    st.info(recommendation)
-    
     st.divider()
     
     # AI Policy Recommendation
