@@ -41,18 +41,18 @@ def generate_why_explanation(row, df):
 
 # Function to generate AI policy recommendation
 @st.cache_data
-def generate_ai_recommendation(_state, _district, _risk_score, _category, _bio_ratio, _child_pressure, _elderly_pressure):
+def generate_ai_recommendation(state, district, risk_score, category, bio_ratio, child_pressure, elderly_pressure):
     prompt = f"""
 You are a public policy advisor for the Government of India, specializing in Aadhaar ecosystem management.
 
 District Context:
-- State: {_state}
-- District: {_district}
-- Service Stress Risk Score: {_risk_score:.4f}
-- Risk Category: {_category}
-- Biometric-to-Enrolment Ratio: {_bio_ratio:.2f}
-- Child Update Pressure: {_child_pressure:.4f}
-- Elderly Update Pressure: {_elderly_pressure:.4f}
+- State: {state}
+- District: {district}
+- Service Stress Risk Score: {risk_score:.4f}
+- Risk Category: {category}
+- Biometric-to-Enrolment Ratio: {bio_ratio:.2f}
+- Child Update Pressure: {child_pressure:.4f}
+- Elderly Update Pressure: {elderly_pressure:.4f}
 
 Please provide a concise policy recommendation (150-200 words) that:
 1. Explains WHY this district is experiencing service stress
