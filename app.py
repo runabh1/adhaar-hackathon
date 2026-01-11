@@ -4,6 +4,10 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
+import google.generativeai as genai
+
+# Configure Gemini API
+genai.configure(api_key="AIzaSyBsi2EIigromumBIZmVHegNSUs0Ue_pK-A")
 
 # Function to classify risk level
 def classify_risk(score):
@@ -34,6 +38,40 @@ def generate_why_explanation(row, df):
         return "This district shows relatively low stress indicators across all measured areas."
     
     return f"This district is risky because of {', '.join(reasons)}. These factors contribute to service overload and potential delays in Aadhaar operations."
+
+# Function to generate AI policy recommendation
+@st.cache_data
+def generate_ai_recommendation(_state, _district, _risk_score, _category, _bio_ratio, _child_pressure, _elderly_pressure):
+    prompt = f"""
+You are a public policy advisor for the Government of India, specializing in Aadhaar ecosystem management.
+
+District Context:
+- State: {_state}
+- District: {_district}
+- Service Stress Risk Score: {_risk_score:.4f}
+- Risk Category: {_category}
+- Biometric-to-Enrolment Ratio: {_bio_ratio:.2f}
+- Child Update Pressure: {_child_pressure:.4f}
+- Elderly Update Pressure: {_elderly_pressure:.4f}
+
+Please provide a concise policy recommendation (150-200 words) that:
+1. Explains WHY this district is experiencing service stress
+2. Recommends 2-3 concrete administrative actions
+3. Uses professional, government-friendly language
+4. Avoids technical jargon
+
+Structure your response with:
+- Brief explanation of stress factors
+- Specific recommendations
+- Expected outcomes
+"""
+
+    try:
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Unable to generate recommendation: {str(e)}"
 
 # Function to compute model reliability metrics
 @st.cache_data
@@ -253,6 +291,25 @@ if not filtered_df.empty:
     
     st.divider()
     
+    # AI Policy Recommendation
+    st.header('AI Policy Recommendation')
+    
+    if st.button('Generate AI Recommendation'):
+        with st.spinner('Generating recommendation...'):
+            ai_rec = generate_ai_recommendation(
+                selected_state, 
+                selected_district, 
+                row['service_stress_risk'], 
+                verdict.split()[0], 
+                row['biometric_to_enrolment_ratio'], 
+                child_pressure, 
+                elderly_pressure
+            )
+            st.text_area('AI-Generated Policy Recommendation', ai_rec, height=200)
+            st.caption('This recommendation is AI-assisted and intended to support administrative decision-making.')
+    
+    st.divider()
+    
     # Why is this district risky?
     st.header('Why is this district risky?')
     why_explanation = generate_why_explanation(row, df)
@@ -260,6 +317,16 @@ if not filtered_df.empty:
     
 else:
     st.warning('No data available for the selected filters. Please adjust your selections.')
+
+st.divider()
+
+# Transparency Note
+st.header('Transparency Note')
+st.markdown("""
+- **ML Model**: Generates quantitative risk scores based on operational data
+- **AI Assistant**: Provides contextual explanations and policy suggestions  
+- **Human Oversight**: Final decisions remain with administrative authorities
+""")
 
 st.divider()
 
