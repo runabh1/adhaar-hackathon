@@ -1,0 +1,5 @@
+aadhaar_merged_dataset.csv
+aadhaar_service_stress_model.pkl
+__pycache__/
+*.pyc
+.DS_Store
