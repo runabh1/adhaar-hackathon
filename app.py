@@ -252,6 +252,15 @@ if not filtered_df.empty:
     
     # Key Metrics
     st.markdown('<div class="section-header"><h3>📈 Key Metrics for Selected District and Date</h3></div>', unsafe_allow_html=True)
+    
+    # Display selected date prominently
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #E8F5E8 0%, #FFFFFF 100%); padding: 15px; border-radius: 10px; border-left: 5px solid #2E7D32; margin: 10px 0 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h4 style="color: #2E7D32; margin: 0; font-weight: bold;">📅 Data Date: {selected_date.strftime('%B %d, %Y')}</h4>
+    <p style="margin: 5px 0 0 0; color: #2E7D32; font-size: 14px;">Analysis based on operational data from this date</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -366,6 +375,7 @@ st.divider()
 # Transparency Note
 st.header('🔍 Transparency Note')
 st.markdown("""
+- **📅 Temporal Data**: Analysis includes time-series data showing service stress evolution over dates
 - **🤖 ML Model**: Generates quantitative risk scores based on operational data
 - **🧠 AI Assistant**: Provides contextual explanations and policy suggestions  
 - **👥 Human Oversight**: Final decisions remain with administrative authorities
@@ -417,17 +427,26 @@ This solution demonstrates how AI and data analytics can enhance government serv
 st.divider()
 
 # Download Option
-st.header('📥 Download Ranked District Stress Data')
-ranked_df = df.groupby('district').agg({
+st.header('📥 Download Complete District Data with Dates')
+st.markdown("""
+Download the complete dataset including all dates and districts for comprehensive analysis. 
+This includes time-series data showing how service stress risk evolves over time.
+""")
+
+# Create comprehensive download with date information
+download_df = df.groupby(['state', 'district', 'date']).agg({
     'service_stress_risk': 'mean',
     'biometric_to_enrolment_ratio': 'mean',
     'child_update_pressure': 'mean',
-    'elderly_update_pressure': 'mean'
-}).reset_index().sort_values('service_stress_risk', ascending=False)
-csv = ranked_df.to_csv(index=False)
+    'elderly_update_pressure': 'mean',
+    'total_enrolment': 'sum',
+    'total_biometric_updates': 'sum'
+}).reset_index().sort_values(['state', 'district', 'date'])
+
+csv = download_df.to_csv(index=False)
 st.download_button(
-    label='📊 Download CSV',
+    label='📊 Download Complete CSV with Dates',
     data=csv,
-    file_name='ranked_district_stress.csv',
+    file_name='aadhaar_service_stress_complete_data.csv',
     mime='text/csv'
 )
