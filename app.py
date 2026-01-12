@@ -9,6 +9,65 @@ import google.generativeai as genai
 # Configure Gemini API
 genai.configure(api_key="AIzaSyBsi2EIigromumBIZmVHegNSUs0Ue_pK-A")
 
+# Custom CSS for Indian theme
+st.markdown("""
+<style>
+    .main-header {
+        background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .main-header h1 {
+        color: #000080 !important;
+        font-size: 2.5em !important;
+        font-weight: bold !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .main-header p {
+        color: #000080 !important;
+        font-size: 1.2em !important;
+        font-weight: 500 !important;
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #FF9933 0%, #138808 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 10px 20px !important;
+        font-weight: bold !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3) !important;
+    }
+    .metric-card {
+        background: linear-gradient(135deg, #E8F5E8 0%, #FFFFFF 100%);
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 5px solid #2E7D32;
+        margin: 10px 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .section-header {
+        background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 20px 0 10px 0;
+        border-left: 5px solid #000080;
+    }
+    .section-header h3 {
+        color: #000080 !important;
+        margin: 0 !important;
+        font-weight: bold !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Function to classify risk level
 def classify_risk(score):
     if score <= 0.2:
@@ -145,14 +204,14 @@ filtered_df = df[(df['state'] == selected_state) &
                  (df['date'].dt.date == selected_date)]
 
 # Main Dashboard
-st.title('Aadhaar Service Stress Risk Dashboard')
-st.markdown('Interactive dashboard for judges to explore Aadhaar service stress risks across districts.')
+st.markdown('<div class="main-header"><h1>🇮🇳 Aadhaar Service Stress Risk Dashboard</h1><p>*Interactive dashboard for judges to explore Aadhaar service stress risks across districts*</p></div>', unsafe_allow_html=True)
+st.markdown('---')
 
 if not filtered_df.empty:
     row = filtered_df.iloc[0]
     
     # District Risk Verdict
-    st.header('District Risk Verdict')
+    st.markdown('<div class="section-header"><h3>🏛️ District Risk Verdict</h3></div>', unsafe_allow_html=True)
     verdict, description = classify_risk(row['service_stress_risk'])
     
     # Determine colors based on risk level
@@ -174,16 +233,16 @@ if not filtered_df.empty:
         text_color = '#721c24'
     
     st.markdown(f"""
-    <div style="background-color: {bg_color}; padding: 20px; border-radius: 10px; border-left: 5px solid {border_color}; margin: 10px 0;">
-    <h2 style="color: {text_color}; margin: 0; font-size: 24px;">{verdict}</h2>
-    <p style="font-size: 18px; margin: 10px 0 0 0; color: {text_color};">{description}</p>
+    <div style="background: linear-gradient(135deg, {bg_color} 0%, #FFFFFF 100%); padding: 25px; border-radius: 15px; border-left: 6px solid {border_color}; margin: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h2 style="color: {text_color}; margin: 0; font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">🏛️ {verdict}</h2>
+    <p style="font-size: 20px; margin: 15px 0 0 0; color: {text_color}; font-weight: 500;">{description}</p>
     </div>
     """, unsafe_allow_html=True)
     
     st.divider()
     
     # District Risk Comparison
-    st.header('District Risk Comparison')
+    st.header('📊 District Risk Comparison')
     district_means = df.groupby('district')['service_stress_risk'].mean()
     selected_mean = district_means[selected_district]
     percentile = (district_means < selected_mean).mean() * 100
@@ -192,7 +251,7 @@ if not filtered_df.empty:
     st.divider()
     
     # Key Metrics
-    st.header('Key Metrics for Selected District and Date')
+    st.markdown('<div class="section-header"><h3>📈 Key Metrics for Selected District and Date</h3></div>', unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -212,14 +271,18 @@ if not filtered_df.empty:
     st.divider()
     
     # Visualizations
-    st.header('Service Stress Risk Trend Over Time')
+    st.header('📊 Service Stress Risk Trend Over Time')
     district_df = df[df['district'] == selected_district].sort_values('date')
     if not district_df.empty:
-        fig, ax = plt.subplots(figsize=(10, 5))
-        ax.plot(district_df['date'], district_df['service_stress_risk'], marker='o')
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Service Stress Risk Score')
-        ax.set_title(f'Service Stress Risk Trend for {selected_district}')
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(district_df['date'], district_df['service_stress_risk'], marker='o', linewidth=3, markersize=8, color='#FF9933', markerfacecolor='#138808', markeredgecolor='#FFFFFF', markeredgewidth=2)
+        ax.set_xlabel('Date', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Service Stress Risk Score', fontsize=12, fontweight='bold')
+        ax.set_title(f'📈 Service Stress Risk Trend for {selected_district}', fontsize=16, fontweight='bold', color='#000080')
+        ax.grid(True, alpha=0.3)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        plt.xticks(rotation=45)
         st.pyplot(fig)
     else:
         st.write('No trend data available for this district.')
@@ -227,22 +290,25 @@ if not filtered_df.empty:
     st.divider()
     
     # Top 10 High-Risk Districts
-    st.header('Top 10 High-Risk Districts (Overall Average Risk)')
+    st.header('🏆 Top 10 High-Risk Districts (Overall Average Risk)')
     district_risk = df.groupby('district')['service_stress_risk'].mean().nlargest(10)
-    fig2, ax2 = plt.subplots(figsize=(10, 5))
-    district_risk.plot(kind='bar', ax=ax2, color='red')
-    ax2.set_xlabel('District')
-    ax2.set_ylabel('Average Service Stress Risk Score')
-    ax2.set_title('Top 10 High-Risk Districts')
+    fig2, ax2 = plt.subplots(figsize=(12, 6))
+    bars = district_risk.plot(kind='bar', ax=ax2, color=['#FF9933', '#FFFFFF', '#138808'] * 4)  # Saffron, White, Green pattern
+    ax2.set_xlabel('District', fontsize=12, fontweight='bold')
+    ax2.set_ylabel('Average Service Stress Risk Score', fontsize=12, fontweight='bold')
+    ax2.set_title('🏆 Top 10 High-Risk Districts', fontsize=16, fontweight='bold', color='#000080')
+    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
     plt.xticks(rotation=45)
     st.pyplot(fig2)
     
     st.divider()
     
     # High-Risk Hotspots in Selected State
-    st.header('High-Risk Hotspots in Selected State')
+    st.header('🎯 High-Risk Hotspots in Selected State')
     state_risks = df[df['state'] == selected_state].groupby('district')['service_stress_risk'].mean().nlargest(5).reset_index()
-    st.table(state_risks.rename(columns={'district': 'District', 'service_stress_risk': 'Average Risk Score'}))
+    st.table(state_risks.rename(columns={'district': '🏛️ District', 'service_stress_risk': '⚠️ Average Risk Score'}))
     
     st.divider()
     
@@ -269,10 +335,10 @@ if not filtered_df.empty:
     st.divider()
     
     # AI Policy Recommendation
-    st.header('AI Policy Recommendation')
+    st.markdown('<div class="section-header"><h3>🤖 AI Policy Recommendation</h3></div>', unsafe_allow_html=True)
     
-    if st.button('Generate AI Recommendation'):
-        with st.spinner('Generating recommendation...'):
+    if st.button('🇮🇳 Generate AI Recommendation'):
+        with st.spinner('🧠 Generating recommendation...'):
             ai_rec = generate_ai_recommendation(
                 selected_state, 
                 selected_district, 
@@ -282,33 +348,33 @@ if not filtered_df.empty:
                 child_pressure, 
                 elderly_pressure
             )
-            st.text_area('AI-Generated Policy Recommendation', ai_rec, height=200)
-            st.caption('This recommendation is AI-assisted and intended to support administrative decision-making.')
+            st.text_area('📋 AI-Generated Policy Recommendation', ai_rec, height=200)
+            st.caption('⚖️ This recommendation is AI-assisted and intended to support administrative decision-making.')
     
     st.divider()
     
     # Why is this district risky?
-    st.header('Why is this district risky?')
+    st.header('❓ Why is this district risky?')
     why_explanation = generate_why_explanation(row, df)
     st.info(why_explanation)
     
 else:
-    st.warning('No data available for the selected filters. Please adjust your selections.')
+    st.warning('⚠️ No data available for the selected filters. Please adjust your selections.')
 
 st.divider()
 
 # Transparency Note
-st.header('Transparency Note')
+st.header('🔍 Transparency Note')
 st.markdown("""
-- **ML Model**: Generates quantitative risk scores based on operational data
-- **AI Assistant**: Provides contextual explanations and policy suggestions  
-- **Human Oversight**: Final decisions remain with administrative authorities
+- **🤖 ML Model**: Generates quantitative risk scores based on operational data
+- **🧠 AI Assistant**: Provides contextual explanations and policy suggestions  
+- **👥 Human Oversight**: Final decisions remain with administrative authorities
 """)
 
 st.divider()
 
 # Model Reliability & Validation
-st.header('Model Reliability & Validation')
+st.header('🔬 Model Reliability & Validation')
 
 mae, rmse, spearman_corr, stability = metrics
 
@@ -333,25 +399,25 @@ This model predicts a continuous risk score and is evaluated on prediction stabi
 st.divider()
 
 # Governance Impact
-st.header('Governance Impact')
+st.header('🏛️ Governance Impact')
 st.markdown("""
 This dashboard serves as a critical decision-support tool for Aadhaar ecosystem governance, enabling:
 
-**Proactive Planning**: Identify emerging stress points before they become service disruptions, allowing preemptive resource allocation.
+**🎯 Proactive Planning**: Identify emerging stress points before they become service disruptions, allowing preemptive resource allocation.
 
-**Targeted Intervention**: Pinpoint specific districts and states requiring immediate attention, ensuring efficient deployment of biometric vans, additional counters, and enrolment camps.
+**📍 Targeted Intervention**: Pinpoint specific districts and states requiring immediate attention, ensuring efficient deployment of biometric vans, additional counters, and enrolment camps.
 
-**Data-Driven Governance**: Transform raw operational data into actionable insights, supporting evidence-based policy decisions that optimize citizen service delivery.
+**📊 Data-Driven Governance**: Transform raw operational data into actionable insights, supporting evidence-based policy decisions that optimize citizen service delivery.
 
-**Reduced Service Disruption**: By anticipating and addressing risk factors early, minimize delays in Aadhaar updates and enrolments, maintaining public trust in the system.
+**⚡ Reduced Service Disruption**: By anticipating and addressing risk factors early, minimize delays in Aadhaar updates and enrolments, maintaining public trust in the system.
 
-This solution demonstrates how AI and data analytics can enhance government service delivery, making Aadhaar operations more resilient and citizen-centric.
+This solution demonstrates how AI and data analytics can enhance government service delivery, making Aadhaar operations more resilient and citizen-centric. 🇮🇳
 """)
 
 st.divider()
 
 # Download Option
-st.header('Download Ranked District Stress Data')
+st.header('📥 Download Ranked District Stress Data')
 ranked_df = df.groupby('district').agg({
     'service_stress_risk': 'mean',
     'biometric_to_enrolment_ratio': 'mean',
@@ -360,7 +426,7 @@ ranked_df = df.groupby('district').agg({
 }).reset_index().sort_values('service_stress_risk', ascending=False)
 csv = ranked_df.to_csv(index=False)
 st.download_button(
-    label='Download CSV',
+    label='📊 Download CSV',
     data=csv,
     file_name='ranked_district_stress.csv',
     mime='text/csv'
