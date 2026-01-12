@@ -302,7 +302,7 @@ if not filtered_df.empty:
     st.header('🏆 Top 10 High-Risk Districts (Overall Average Risk)')
     district_risk = df.groupby('district')['service_stress_risk'].mean().nlargest(10)
     fig2, ax2 = plt.subplots(figsize=(12, 6))
-    bars = district_risk.plot(kind='bar', ax=ax2, color=['#FF9933', '#FFFFFF', '#138808'] * 4)  # Saffron, White, Green pattern
+    bars = district_risk.plot(kind='bar', ax=ax2, color='#FF9933')  # Orange color for all bars
     ax2.set_xlabel('District', fontsize=12, fontweight='bold')
     ax2.set_ylabel('Average Service Stress Risk Score', fontsize=12, fontweight='bold')
     ax2.set_title('🏆 Top 10 High-Risk Districts', fontsize=16, fontweight='bold', color='#000080')
